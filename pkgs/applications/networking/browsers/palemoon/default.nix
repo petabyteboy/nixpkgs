@@ -10,14 +10,14 @@
 
 stdenv.mkDerivation rec {
   name = "palemoon-${version}";
-  version = "28.2.1";
+  version = "28.4.1";
 
   src = fetchFromGitHub {
     name   = "palemoon-src";
     owner  = "MoonchildProductions";
     repo   = "UXP";
     rev    = "PM${version}_Release";
-    sha256 = "0jcp5imiar88r72kspwjynbl0r3v90knyszagjydkrx9g58lkpzr";
+    sha256 = "0p1szzfhcavnvc6x9ss5f0zbgvw453bhh438i894n22kjskji5ps";
   };
 
   desktopItem = makeDesktopItem {
@@ -104,7 +104,7 @@ stdenv.mkDerivation rec {
     for n in 16 22 24 32 48 256; do
       size=$n"x"$n
       mkdir -p $out/share/icons/hicolor/$size/apps
-      cp $src/application/palemoon/branding/official/$n.png \
+      cp $src/application/palemoon/branding/official/default$n.png \
          $out/share/icons/hicolor/$size/apps/palemoon.png
     done
 
