@@ -13,6 +13,10 @@ stdenv.mkDerivation rec {
     ./0001-add-post-extract-hook.patch
     ./0002-binaries-with-env-shebang.patch
     ./0003-gem-install-default-to-user.patch
+    (fetchpatch {
+      url = https://patch-diff.githubusercontent.com/raw/rubygems/rubygems/pull/2596.patch;
+      sha256 = "0m1s5brd30bqcr8v99sczihm83g270philx83kkw5bpix462fdm3";
+    })
   ];
 
   installPhase = ''
