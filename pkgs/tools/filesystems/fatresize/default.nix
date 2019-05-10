@@ -16,7 +16,10 @@ stdenv.mkDerivation rec {
   # It basically modifies the detection scheme for parted version (the current one has no micro version defined)
   # The second change is to include a header for a moved function since 1.6+ to current 3.1+ parted
   # The third change is to modify the call to PED_ASSERT that is no longer defined with 2 params
-  patches = [ ./fatresize_parted_nix.patch ];
+  patches = [
+    ./fatresize_parted_nix.patch
+    ./allow-devXpY-scheme.patch
+  ];
 
   preConfigure = ''
     echo "Replacing calls to ped_free with free ..."
