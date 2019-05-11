@@ -19,6 +19,7 @@
 , langGo
 , langObjC
 , langObjCpp
+, langAda ? false
 }:
 
 assert cloog != null -> stdenv.lib.versionOlder version "5";
@@ -113,6 +114,7 @@ let
         lib.concatStrings (lib.intersperse ","
           (  lib.optional langC        "c"
           ++ lib.optional langCC       "c++"
+          ++ lib.optional langAda      "ada"
           ++ lib.optional langFortran  "fortran"
           ++ lib.optional langJava     "java"
           ++ lib.optional langGo       "go"
@@ -134,6 +136,7 @@ let
 
     # Optional features
     ++ lib.optional (isl != null) "--with-isl=${isl}"
+    ++ lib.optional langAda "--enable-libada"
     ++ lib.optionals (cloog != null) [
       "--with-cloog=${cloog}"
       "--disable-cloog-version-check"
