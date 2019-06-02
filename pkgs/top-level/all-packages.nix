@@ -8152,6 +8152,14 @@ in
     profiledCompiler = false;
   });
 
+  ghdl-mcode = callPackage ../development/compilers/ghdl {
+    backend = "mcode";
+  };
+
+  ghdl-llvm = callPackage ../development/compilers/ghdl {
+    backend = "llvm";
+  };
+
   gcl = callPackage ../development/compilers/gcl {
     gmp = gmp4;
   };
