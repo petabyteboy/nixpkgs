@@ -290,7 +290,7 @@ stdenv.mkDerivation {
     '' + optionalString cc.langAda or false ''
       basePath=$(echo $cc/lib/*/*/*)
       ccCFlags+=" -B$basePath -I$basePath/adainclude"
-      gnatCFlags="-aI$basePath/adainclude -aO$basePath/adalib"
+      gnatCFlags="-I$basePath/adainclude -I$basePath/adalib"
 
       echo "$gnatCFlags" > $out/nix-support/gnat-cflags
     '' + ''
