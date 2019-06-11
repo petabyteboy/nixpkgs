@@ -10,12 +10,12 @@ let
 
 in buildPythonPackage rec {
   pname = "pyqtwebengine";
-  version = "5.12";
+  version = "5.12.1";
   format = "other";
 
   src = fetchurl {
-    url = "https://www.riverbankcomputing.com/static/Downloads/PyQtWebEngine/PyQtWebEngine_gpl-${version}.tar.gz";
-    sha256 = "0j9zzgwrvh61mrzjfcdlhr08vg931ycb53ri51vynsj0grp07smn";
+    url = "https://www.riverbankcomputing.com/static/Downloads/PyQtWebEngine/${version}/PyQtWebEngine_gpl-${version}.tar.gz";
+    sha256 = "0wylkd7fh2g27y3710rpxmj9wx0wpi3z7qbv6khiddm15rkh81w6";
   };
 
   outputs = [ "out" "dev" ];
@@ -39,7 +39,8 @@ in buildPythonPackage rec {
       --no-dist-info \
       --apidir="$out/api/${python.libPrefix}" \
       --sipdir="$out/share/sip/PyQt5" \
-      --pyqt-sipdir="${pyqt5}/share/sip/PyQt5"
+      --pyqt-sipdir="${pyqt5}/share/sip/PyQt5" \
+      --sip="${sip}/bin/sip"
 
     runHook postConfigure
   '';
