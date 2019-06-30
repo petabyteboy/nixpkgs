@@ -8152,6 +8152,8 @@ in
     profiledCompiler = false;
   });
 
+  ghdl = ghdl-mcode;
+
   ghdl-mcode = callPackage ../development/compilers/ghdl {
     backend = "mcode";
   };
