@@ -47,7 +47,6 @@ in buildPythonPackage rec {
     ${python.executable} configure.py  -w \
       --confirm-license \
       --dbus-moduledir=$out/${python.sitePackages}/dbus/mainloop \
-      --no-qml-plugin \
       --bindir=$out/bin \
       --destdir=$out/${python.sitePackages} \
       --stubsdir=$out/${python.sitePackages}/PyQt5 \

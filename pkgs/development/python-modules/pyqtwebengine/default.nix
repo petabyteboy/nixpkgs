@@ -14,13 +14,13 @@ in buildPythonPackage rec {
   format = "other";
 
   src = fetchurl {
-    url = "https://www.riverbankcomputing.com/static/Downloads/PyQtWebEngine/PyQtWebEngine_gpl-${version}.tar.gz";
+    url = "https://www.riverbankcomputing.com/static/Downloads/PyQtWebEngine/${version}/PyQtWebEngine_gpl-${version}.tar.gz";
     sha256 = "0j9zzgwrvh61mrzjfcdlhr08vg931ycb53ri51vynsj0grp07smn";
   };
 
   outputs = [ "out" "dev" ];
 
-  nativeBuildInputs = [ pkgconfig qmake ];
+  nativeBuildInputs = [ pkgconfig qmake sip ];
 
   buildInputs = [ sip qtbase qtsvg qtwebengine ];
 
