@@ -372,6 +372,7 @@ mapAliases ({
   tshark = wireshark-cli; # added 2018-04-25
   ucsFonts = ucs-fonts; # added 2016-07-15
   ultrastardx-beta = ultrastardx; # added 2017-08-12
+  unifiTesting = throw "deprecated 2019-09-03: abandoned by upstream, use unifiStable instead";
   usb_modeswitch = usb-modeswitch; # added 2016-05-10
   v4l_utils = v4l-utils; # added 2019-08-07
   vimbWrapper = vimb; # added 2015-01
