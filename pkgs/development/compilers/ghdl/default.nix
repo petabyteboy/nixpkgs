@@ -1,10 +1,10 @@
-{ stdenv, fetchFromGitHub, gnat, zlib, llvm, ncurses, clang
+{ stdenv, fetchFromGitHub, gnat, zlib, llvm, lib
 , backend ? "mcode" }:
 
 assert backend == "mcode" || backend == "llvm";
 
 let
-  inherit (stdenv.lib) optional optionals;
+  inherit (lib) optional optionals maintainers platforms licenses;
   version = "0.36";
 
 in stdenv.mkDerivation rec {
@@ -17,20 +17,20 @@ in stdenv.mkDerivation rec {
     sha256 = "0wcn4qgalc8mqrpi0nyy5pd74kjf9ldzp3pvz53p3fa6s8fswq0c";
   };
 
-  buildInputs = [ gnat zlib ]; # ++ optionals (backend == "llvm") [ clang ncurses ];
+  buildInputs = [ gnat zlib ];
 
   configureFlags = optional (backend == "llvm")
     "--with-llvm-config=${llvm}/bin/llvm-config";
 
-  #hardeningDisable = [ "all" ];
+  hardeningDisable = [ "format" ];
 
   enableParallelBuilding = true;
 
   meta = {
     homepage = "https://github.com/ghdl/ghdl";
     description = "VHDL 2008/93/87 simulator";
-    maintainers = with stdenv.lib.maintainers; [ lucus16 ];
-    platforms = stdenv.lib.platforms.linux;
-    license = stdenv.lib.licenses.gpl2;
+    maintainers = with maintainers; [ lucus16 ];
+    platforms = platforms.linux;
+    license = licenses.gpl2;
   };
 }
