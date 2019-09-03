@@ -17,7 +17,14 @@ in stdenv.mkDerivation rec {
     sha256 = "0wcn4qgalc8mqrpi0nyy5pd74kjf9ldzp3pvz53p3fa6s8fswq0c";
   };
 
+  LIBRARY_PATH = "${stdenv.cc.libc}/lib";
+
   buildInputs = [ gnat zlib ];
+
+  preConfigure = ''
+    # If llvm 7.0 works, 7.x releases should work too.
+    sed -i 's/check_version 7.0/check_version 7/g' configure
+  '';
 
   configureFlags = optional (backend == "llvm")
     "--with-llvm-config=${llvm}/bin/llvm-config";
