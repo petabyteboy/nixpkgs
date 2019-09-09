@@ -53,6 +53,7 @@ let
     qtbase = [
       ./qtbase.patch
       ./qtbase-fixguicmake.patch
+      ./qtbase-trayicons.patch
     ];
     qtdeclarative = [ ./qtdeclarative.patch ];
     qtscript = [ ./qtscript.patch ];
@@ -67,6 +68,10 @@ let
         ./qtwebkit-darwin-no-qos-classes.patch
       ];
     qttools = [ ./qttools.patch ];
+    qtwayland = [
+      ./qtwayland-fix-webengine-freezeups-1.patch
+      ./qtwayland-fix-webengine-freezeups-2.patch
+    ];
   };
 
   qtModule =
