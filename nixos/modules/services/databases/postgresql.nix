@@ -22,6 +22,16 @@ let
       ${cfg.extraConfig}
     '';
 
+  ensureDatabasesOpts = {
+    options = {
+      initialScript = mkOption {
+        description = "Scripts to be run after the database has been created";
+        type = types.nullOr types.path;
+        default = null;
+      };
+    };
+  };
+
 in
 
 {
@@ -97,18 +107,21 @@ in
       };
 
       ensureDatabases = mkOption {
-        type = types.listOf types.str;
-        default = [];
+        type = types.either (types.listOf types.str) (types.attrsOf (types.submodule ensureDatabasesOpts));
+        default = {};
         description = ''
           Ensures that the specified databases exist.
           This option will never delete existing databases, especially not when the value of this
           option is changed. This means that databases created once through this option or
           otherwise have to be removed manually.
         '';
-        example = [
-          "gitea"
-          "nextcloud"
-        ];
+        example = {
+          "gitea" = {};
+          "nextcloud" = {
+            "initialScript" = "myapplication load schema";
+          };
+        };
+        apply = x: if (isList x) then listToAttrs (map (e: nameValuePair e {}) x) else x;
       };
 
       ensureUsers = mkOption {
@@ -329,14 +342,16 @@ in
 
             if test -e "${cfg.dataDir}/.first_startup"; then
               ${optionalString (cfg.initialScript != null) ''
-                $PSQL -f "${cfg.initialScript}" -d postgres
+${pkgs.mastodon}/bin                $PSQL -f "${cfg.initialScript}" -d postgres
               ''}
               rm -f "${cfg.dataDir}/.first_startup"
             fi
-          '' + optionalString (cfg.ensureDatabases != []) ''
-            ${concatMapStrings (database: ''
-              $PSQL -tAc "SELECT 1 FROM pg_database WHERE datname = '${database}'" | grep -q 1 || $PSQL -tAc 'CREATE DATABASE "${database}"'
-            '') cfg.ensureDatabases}
+          '' + optionalString (cfg.ensureDatabases != {}) ''
+            ${concatStrings (mapAttrsToList (database: opts: ''
+              $PSQL -tAc "SELECT 1 FROM pg_database WHERE datname = '${database}'" | grep -q 1 && export DB_EXISTS_${database}=1 || export DB_EXISTS_${database}=0
+              echo db ${database} exists: $DB_EXISTS_${database}
+              test $DB_EXISTS_${database} -eq 0 && $PSQL -tAc 'CREATE DATABASE "${database}"'
+            '') cfg.ensureDatabases)}
           '' + ''
             ${concatMapStrings (user: ''
               $PSQL -tAc "SELECT 1 FROM pg_roles WHERE rolname='${user.name}'" | grep -q 1 || $PSQL -tAc "CREATE USER ${user.name}"
@@ -344,6 +359,10 @@ in
                 $PSQL -tAc 'GRANT ${permission} ON ${database} TO ${user.name}'
               '') user.ensurePermissions)}
             '') cfg.ensureUsers}
+          '' + optionalString (cfg.ensureDatabases != {}) ''
+            ${concatStrings (mapAttrsToList (database: opts: ''
+              ${if opts.initialScript == null then "" else "test $DB_EXISTS_${database} -eq 0 && ${opts.initialScript}"}
+            '') cfg.ensureDatabases)}
           '';
 
         unitConfig.RequiresMountsFor = "${cfg.dataDir}";
