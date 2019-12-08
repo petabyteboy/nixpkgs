@@ -88,6 +88,7 @@ let
         ./qtwebkit-darwin-no-qos-classes.patch
       ];
     qttools = [ ./qttools.patch ];
+    qtwayland = [ ./clipboard.patch ];
   };
 
   qtModule =
