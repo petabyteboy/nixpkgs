@@ -6,6 +6,13 @@
 , perl
 , jre
 , libpulseaudio
+, jdk
+, zip
+, SDL2
+, glew
+, ant
+, openal
+, pkgconfig
 
 # Make the build version easily overridable.
 # Server and client build versions must match, and an empty build version means
@@ -21,14 +28,14 @@ let
   # Note: when raising the version, ensure that all SNAPSHOT versions in
   # build.gradle are replaced by a fixed version
   # (the current one at the time of release) (see postPatch).
-  version = "103";
+  version = "master";
   buildVersion = makeBuildVersion version;
 
   src = fetchFromGitHub {
     owner = "Anuken";
     repo = "Mindustry";
-    rev = "v${version}";
-    sha256 = "0s9pzmnq2v3glbmb6kqifar62wi44z4sg14dnayyj0fjkx6sh05s";
+    rev = "9ef394a99ea06b5e39e9208839e946a8602afd63";
+    sha256 = "01qliqypjbwsjy1cq4nwx9irhamqk3qndyj95n5i5zgkw8av3js4";
   };
 
   desktopItem = makeDesktopItem {
@@ -50,17 +57,12 @@ let
   '';
 
   # fake build to pre-download deps into fixed-output derivation
-  deps = stdenv.mkDerivation {
-    pname = "${pname}-deps";
-    inherit version src postPatch;
-    nativeBuildInputs = [ gradle_5 perl ];
-    # Here we build both the server and the client so we only have to specify
-    # one hash for 'deps'. Deps can be garbage collected after the build,
-    # so this is not really an issue.
+  mkDeps = args: stdenv.mkDerivation (args // {
+    pname = "${args.pname}-deps";
+    nativeBuildInputs = [ gradle_5 perl ] ++ stdenv.lib.optional (args ? nativeBuildInputs) args.nativeBuildInputs;
     buildPhase = ''
       export GRADLE_USER_HOME=$(mktemp -d)
-      gradle --no-daemon desktop:dist -Pbuildversion=${buildVersion}
-      gradle --no-daemon server:dist -Pbuildversion=${buildVersion}
+      ${stdenv.lib.concatMapStringsSep "\n" (v: "gradle --no-daemon ${v} -Pbuildversion=${buildVersion}") args.gradleTasks}
     '';
     # perl code mavenizes pathes (com.squareup.okio/okio/1.13.0/a9283170b7305c8d92d25aff02a6ab7e45d06cbe/okio-1.13.0.jar -> com/squareup/okio/okio/1.13.0/okio-1.13.0.jar)
     installPhase = ''
@@ -70,7 +72,18 @@ let
     '';
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
-    outputHash = "16k058fw9yk89adx8j1708ynfri5yizmmvh49prls9slw4hipffb";
+  });
+
+  deps = mkDeps {
+    # Here we build both the server and the client so we only have to specify
+    # one hash for 'deps'. Deps can be garbage collected after the build,
+    # so this is not really an issue.
+    gradleTasks = [
+      "desktop:dist"
+      "server:dist"
+    ];
+    outputHash = "0dgx1m4qhjqicq9zjx3l6b26k8cy2053s440ivyq7n9r103y9iqd";
+    inherit version src postPatch pname;
   };
 
   # Separate commands for building and installing the server and the client
@@ -83,11 +96,28 @@ let
   installClient = ''
     install -Dm644 desktop/build/libs/Mindustry.jar $out/share/mindustry.jar
     mkdir -p $out/bin
+
     makeWrapper ${jre}/bin/java $out/bin/mindustry \
       --prefix LD_LIBRARY_PATH : ${libpulseaudio}/lib \
+      --prefix LD_LIBRARY_PATH : ${glew.out}/lib \
+      --set SDL_VIDEODRIVER x11 \
       --add-flags "-jar $out/share/mindustry.jar"
+
+    makeWrapper ${jre}/bin/java $out/bin/mindustry-wayland \
+      --prefix LD_LIBRARY_PATH : ${libpulseaudio}/lib \
+      --prefix LD_LIBRARY_PATH : ${glew-egl.out}/lib \
+      --set SDL_VIDEODRIVER wayland \
+      --add-flags "-jar $out/share/mindustry.jar"
+
     install -Dm644 core/assets/icons/icon_64.png $out/share/icons/hicolor/64x64/apps/mindustry.png
     install -Dm644 ${desktopItem}/share/applications/Mindustry.desktop $out/share/applications/Mindustry.desktop
+
+    pushd ${arc-natives}
+    zip $out/share/mindustry.jar libsdl-arc64.so
+    popd
+    pushd ${SDL2}/lib
+    zip $out/share/mindustry.jar libSDL2.so
+    popd
   '';
   installServer = ''
     install -Dm644 server/build/libs/server-release.jar $out/share/mindustry-server.jar
@@ -96,13 +126,49 @@ let
       --add-flags "-jar $out/share/mindustry-server.jar"
   '';
 
+  glew-egl = glew.overrideAttrs (oldAttrs: {
+    pname = "glew-egl";
+    makeFlags = [ "SYSTEM=linux-egl" ];
+  });
+
+  arc-natives = let
+    pname = "arc-natives";
+    version = "1.0";
+    src = fetchFromGitHub {
+      owner = "PetaByteBoy";
+      repo = "Arc";
+      rev = "feature/dynamic-natives";
+      sha256 = "0fz36mcv3ri447mhi95l42b06gjn1ahq2z731jl80y46i37m5vr0";
+    };
+    buildInputs = [ SDL2 glew openal ];
+    nativeBuildInputs = [ pkgconfig gradle_5 makeWrapper zip jdk ant ];
+    deps = mkDeps {
+      gradleTasks = [ "sdlnatives -Pdynamic" ];
+      outputHash = "0hy43j7pkbw4wq7424zh4sm3wb4p21yp92r15wzfb3fmjbymcmsr";
+      inherit pname version src buildInputs nativeBuildInputs;
+    };
+  in stdenv.mkDerivation rec {
+    inherit pname version src buildInputs nativeBuildInputs;
+    buildPhase = ''
+      echo $PATH
+      export GRADLE_USER_HOME=$(mktemp -d)
+      # point to offline repo
+      sed -ie "s#mavenCentral()#mavenCentral(); maven { url '${deps}' }#g" build.gradle
+      gradle --offline --no-daemon sdlnatives -Pdynamic
+    '';
+    installPhase = ''
+      install -Dm644 backends/backend-sdl/libs/linux64/libsdl-arc64.so $out/libsdl-arc64.so
+    '';
+  };
+
 in
 assert stdenv.lib.assertMsg (enableClient || enableServer)
   "mindustry: at least one of 'enableClient' and 'enableServer' must be true";
 stdenv.mkDerivation rec {
   inherit pname version src postPatch;
 
-  nativeBuildInputs = [ gradle_5 makeWrapper ];
+  buildInputs = stdenv.lib.optional enableClient [ SDL2 glew ];
+  nativeBuildInputs = [ gradle_5 makeWrapper zip ];
 
   buildPhase = with stdenv.lib; ''
     export GRADLE_USER_HOME=$(mktemp -d)
@@ -123,7 +189,7 @@ stdenv.mkDerivation rec {
     description = "A sandbox tower defense game";
     license = licenses.gpl3;
     maintainers = with maintainers; [ fgaz ];
-    platforms = platforms.all;
+    platforms = [ "x86_64-linux" ];
   };
 }
 
