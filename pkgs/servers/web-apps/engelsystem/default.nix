@@ -23,7 +23,7 @@ stdenv.mkDerivation rec {
     rm -r ./docker/
 
     ln -sf /etc/engelsystem/config.php ./config/config.php
-    ln -sf /var/lib/engelsystem/ ./storage
+    ln -sf /var/lib/engelsystem/storage ./storage
 
     mkdir -p $out/share/engelsystem
     mkdir -p $out/bin
