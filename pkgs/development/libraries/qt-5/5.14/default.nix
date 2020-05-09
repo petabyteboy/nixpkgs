@@ -63,8 +63,9 @@ let
         ./qtbase.patch.d/0006-qtbase-gtk3.patch
         ./qtbase.patch.d/0007-qtbase-xcursor.patch
         ./qtbase.patch.d/0008-qtbase-tzdir.patch
-        ./qtbase.patch.d/0009-qtbase-assert.patch
-        ./qtbase.patch.d/0010-fix-header_module.patch
+        ./qtbase.patch.d/0009-qtbase-qtpluginpath.patch
+        ./qtbase.patch.d/0010-qtbase-assert.patch
+        ./qtbase.patch.d/0011-fix-header_module.patch
       ];
     qtdeclarative = [ ./qtdeclarative.patch ];
     qtscript = [ ./qtscript.patch ];
