@@ -310,7 +310,6 @@ in
         domain = "auth.${cfg.hostName}";
         passwordFile = "/var/lib/jitsi-meet/videobridge-secret";
         mucJids = "jvbbrewery@internal.${cfg.hostName}";
-        disableCertificateVerification = true;
       };
     };
 
