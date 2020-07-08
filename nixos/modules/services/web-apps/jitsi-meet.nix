@@ -137,9 +137,9 @@ in
         a proxy for the XMPP server. Further nginx configuration can be done by adapting
         <option>services.nginx.virtualHosts.&lt;hostName&gt;</option>.
         When this is enabled, ACME will be used to retrieve a TLS certificate by default. To disable
-        this, set the <option>services.nginx.virtualHosts.&lt;hostName&gt.enableACME</option> to
+        this, set the <option>services.nginx.virtualHosts.&lt;hostName&gt;.enableACME</option> to
         <literal>false</literal> and if appropriate do the same for
-        <option>services.nginx.virtualHosts.&lt;hostName&gt.forceSSL</option>.
+        <option>services.nginx.virtualHosts.&lt;hostName&gt;.forceSSL</option>.
       '';
     };
 
