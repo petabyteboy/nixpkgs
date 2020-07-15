@@ -49,7 +49,7 @@ in {
   };
 
   unifiStable = generic {
-    version = "5.12.72";
-    sha256 = "00d7kxn3f1c0i4kg81hz2hf9bdbccb3d1zs7js414rpc5k3xg3kz";
+    version = "5.13.32";
+    sha256 = "0r1lz73hn4pl5jygmmfngr8sr0iybirsqlkcdkq31a36vcr567i8";
   };
 }

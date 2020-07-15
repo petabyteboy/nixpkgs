@@ -24,6 +24,7 @@
 , gomodifytags, gotags, gotools, go-motion
 , gnused, reftools, gogetdoc, golangci-lint
 , impl, iferr, gocode, gocode-gomod, go-tools
+, gopls
 
 # direnv-vim dependencies
 , direnv
@@ -97,8 +98,6 @@ self: super: {
     # These usually implicitly set by cc-wrapper around clang (pkgs/build-support/cc-wrapper).
     # The linked ruby code shows generates the required '.clang_complete' for cmake based projects
     # https://gist.github.com/Mic92/135e83803ed29162817fce4098dec144
-    # as an alternative you can execute the following command:
-    # $ eval echo $(nix-instantiate --eval --expr 'with (import <nixpkgs>) {}; clang.default_cxx_stdlib_compile')
     preFixup = ''
       substituteInPlace "$out"/share/vim-plugins/clang_complete/plugin/clang_complete.vim \
         --replace "let g:clang_library_path = '' + "''" + ''" "let g:clang_library_path='${llvmPackages.clang.cc.lib}/lib/libclang.so'"
@@ -555,6 +554,10 @@ self: super: {
     dependencies = with super; [ vim-maktaba ];
   });
 
+  vim-beancount = super.vim-beancount.overrideAttrs(old: {
+    passthru.python3Dependencies = ps: with ps; [ beancount ];
+  });
+
   vim-codefmt = super.vim-codefmt.overrideAttrs(old: {
     dependencies = with super; [ vim-maktaba ];
   });
@@ -593,6 +596,7 @@ self: super: {
       golint
       golangci-lint
       gomodifytags
+      gopls
       gotags
       gotools
       iferr

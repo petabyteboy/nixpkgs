@@ -66,6 +66,7 @@ mapAliases ({
   buildGo112Module = throw "buildGo112Module has been removed"; # added 2020-04-26
   bundler_HEAD = bundler; # added 2015-11-15
   cantarell_fonts = cantarell-fonts; # added 2018-03-03
+  casperjs = throw "casperjs has been removed, it was abandoned by upstream and broken.";
   catfish = xfce.catfish; # added 2019-12-22
   cgmanager = throw "cgmanager was deprecated by lxc and therefore removed from nixpkgs."; # added 2020-06-05
   checkbashism = checkbashisms; # added 2016-08-16
@@ -76,7 +77,6 @@ mapAliases ({
   clangAnalyzer = clang-analyzer;  # added 2015-02-20
   clawsMail = claws-mail; # added 2016-04-29
   clutter_gtk = clutter-gtk; # added 2018-02-25
-  conkerorWrapper = conkeror; # added 2015-01
   compton = picom; # added 2019-12-02
   compton-git = compton; # added 2019-05-20
   conntrack_tools = conntrack-tools; # added 2018-05
@@ -87,6 +87,7 @@ mapAliases ({
   cpp-gsl = microsoft_gsl; # added 2019-05-24
   cupsBjnp = cups-bjnp; # added 2016-01-02
   cups_filters = cups-filters; # added 2016-08
+  cquery = throw "cquery has been removed because it is abandoned by upstream. Consider switching to clangd or ccls instead."; # added 2020-06-15
   cv = progress; # added 2015-09-06
   d1x_rebirth = dxx-rebirth; # added 2018-04-25
   d2x_rebirth = dxx-rebirth; # added 2018-04-25
@@ -126,17 +127,6 @@ mapAliases ({
   firefox-esr-wrapper = firefox-esr;  # 2016-01
   firefox-wrapper = firefox;          # 2016-01
   firefoxWrapper = firefox;           # 2015-09
-  firefox-esr-52           = firefoxPackages.firefox-esr-52; # 2020-02, remove after 20.03 branchoff
-  firefox-esr-52-unwrapped = firefoxPackages.firefox-esr-52; # 2020-02, remove after 20.03 branchoff
-  firefox-esr-60           = firefoxPackages.firefox-esr-60; # 2020-02, remove after 20.03 branchoff
-  firefox-esr-60-unwrapped = firefoxPackages.firefox-esr-60; # 2020-02, remove after 20.03 branchoff
-  icecat                   = firefoxPackages.icecat;         # 2020-02, remove after 20.03 branchoff
-  icecat-unwrapped         = firefoxPackages.icecat;         # 2020-02, remove after 20.03 branchoff
-  conkeror-unwrapped       = conkeror; # 2020-02, remove after 20.03 branchoff
-  conkeror                 = throw ''
-    Conkeror doesn't work with any secure firefox release.
-    Please move to some of the alternatives at http://conkeror.org/Alternatives
-  ''; # 2020-02, remove after 20.03 branchoff
 
   firestr = throw "firestr has been removed."; # added 2019-12-08
   flameGraph = flamegraph; # added 2018-04-25
@@ -153,6 +143,7 @@ mapAliases ({
   fuseki = apache-jena-fuseki; # added 2018-04-25
   fusesmb = throw "fusesmb is abandoned by upstream"; # added 2019-10-15
   fwupdate = throw "fwupdate was merged into fwupd"; # added 2020-05-19
+  g4py = python3Packages.geant4; # added 2020-06-06
   gccApple = throw "gccApple is no longer supported"; # added 2018-04-25
   gdb-multitarget = gdb; # added 2017-11-13
   gdk_pixbuf = gdk-pixbuf; # added 2019-05-22
@@ -198,7 +189,6 @@ mapAliases ({
   gupnp_igd = gupnp-igd; # added 2018-02-25
   gupnptools = gupnp-tools;  # added 2015-12-19
   gutenberg = zola;  # added 2018-11-17
-  hamster-time-traker = throw "hamster-time-tracker has been removed from nixpkgs, as it was unmaintained."; # added 2019-12-10
   heimdalFull = heimdal; # added 2018-05-01
   hepmc = hepmc2; # added 2019-08-05
   hexen = throw "hexen (SDL port) has been removed: Abandoned by upstream."; # added 2019-12-11
@@ -250,6 +240,7 @@ mapAliases ({
   libjpeg_drop = libjpeg_original; # added 2020-06-05
   libjson_rpc_cpp = libjson-rpc-cpp; # added 2017-02-28
   liblapackWithoutAtlas = lapack-reference; # added 2018-11-05
+  liblastfm = libsForQt5.liblastfm; # added 2020-06-14
   liblrdf = lrdf; # added 2018-04-25
   libqrencode = qrencode;  # added 2019-01-01
   librdf = lrdf; # added 2020-03-22
@@ -261,6 +252,7 @@ mapAliases ({
   libudev = udev; # added 2018-04-25
   libusb = libusb1; # added 2020-04-28
   libsexy = throw "libsexy has been removed from nixpkgs, as it's abandoned and no package needed it."; # 2019-12-10
+  libstdcxxHook = throw "libstdcxx hook has been removed because cc-wrapper is now directly aware of the c++ standard library intended to be used."; # 2020-06-22
   libqmatrixclient = throw "libqmatrixclient was renamed to libquotient"; # added 2020-04-09
   links = links2; # added 2016-01-31
   linux_rpi0 = linux_rpi1;
@@ -309,7 +301,7 @@ mapAliases ({
   msf = metasploit; # added 2018-04-25
   libmsgpack = msgpack; # added 2018-08-17
   mssys = ms-sys; # added 2015-12-13
-  mpv-with-scripts = throw "Use wrapMpv for editing the environment of mpv"; # added 2012-05-22
+  mpv-with-scripts = self.wrapMpv self.mpv-unwrapped { }; # added 2020-05-22
   multipath_tools = multipath-tools;  # added 2016-01-21
   mupen64plus1_5 = mupen64plus; # added 2016-02-12
   mysqlWorkbench = mysql-workbench; # added 2017-01-19
@@ -563,6 +555,7 @@ mapAliases ({
   telepathy_idle = telepathy-idle; # added 2018-02-25
   telepathy_logger = telepathy-logger; # added 2018-02-25
   telepathy_mission_control = telepathy-mission-control; # added 2018-02-25
+  telepathy-qt = throw "telepathy-qt no longer supports Qt 4. Please use libsForQt5.telepathy instead."; # added 2020-07-02
   telepathy_qt = telepathy-qt; # added 2018-02-25
   telepathy_qt5 = libsForQt5.telepathy;  # added 2015-12-19
   telepathy_salut = telepathy-salut; # added 2018-02-25
@@ -623,6 +616,7 @@ mapAliases ({
   xfce4-14 = xfce;
   xfce4-12 = throw "xfce4-12 has been replaced by xfce4-14"; # added 2020-03-14
   x11 = xlibsWrapper; # added 2015-09
+  xara = throw "xara has been removed from nixpkgs. Unmaintained since 2006"; # added 2020-06-24
   xbmc = kodi; # added 2018-04-25
   xbmcPlain = kodiPlain; # added 2018-04-25
   xbmcPlugins = kodiPlugins; # added 2018-04-25
@@ -697,23 +691,6 @@ mapAliases ({
 
   # added 2020-02-09
   dina-font-pcf = dina-font;
-
-    /* Cleanup before 20.09 */
-  llvm_4 = throw ''
-    The LLVM versions 3.5, 3.9 and 4.0 have been removed in NixOS 20.03
-    due to a lack of compatibility with glibc 2.30!
-  '';
-  llvm_39 = llvm_4;
-  llvm_35 = llvm_4;
-  lld_4 = llvm_4;
-
-  llvmPackages_4 = llvm_4;
-  llvmPackages_39 = llvm_4;
-  llvmPackages_35 = llvm_4;
-
-  clang_39 = llvm_4;
-  clang_35 = llvm_4;
-  clang_4 = llvm_4;
 
   # added 2019-04-13
   # *-polly pointed to llvmPackages_latest
