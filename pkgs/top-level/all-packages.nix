@@ -1891,9 +1891,14 @@ in
 
   tllist = callPackage ../development/libraries/tllist { };
 
-  fcft = callPackage ../development/libraries/fcft { };
+  fcft-0_4_x = callPackage ../development/libraries/fcft/0.4 { };
+  fcft-1_1_x = callPackage ../development/libraries/fcft/1.1 { };
+  fcft-2_2_x = callPackage ../development/libraries/fcft/2.2 { };
+  fcft = fcft-2_2_x;
 
-  fuzzel = callPackage ../applications/misc/fuzzel { };
+  fuzzel = callPackage ../applications/misc/fuzzel {
+    fcft = fcft-0_4_x;
+  };
 
   fwup = callPackage ../tools/misc/fwup { };
 
