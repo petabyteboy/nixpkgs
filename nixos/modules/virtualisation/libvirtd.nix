@@ -98,6 +98,16 @@ in {
       '';
     };
 
+    qemuOvmfPackage = mkOption {
+      type = types.package;
+      default = pkgs.OVMF;
+      defaultText = "pkgs.OVMF";
+      example = literalExample "pkgs.OVMF-CSM";
+      description = ''
+        The OVMF package that will be made available to libvirtd.
+      '';
+    };
+
     extraOptions = mkOption {
       type = types.listOf types.str;
       default = [ ];
@@ -197,8 +207,8 @@ in {
         done
 
         ${optionalString cfg.qemuOvmf ''
-          ln -s --force ${pkgs.OVMF.fd}/FV/OVMF_CODE.fd /run/${dirName}/nix-ovmf/
-          ln -s --force ${pkgs.OVMF.fd}/FV/OVMF_VARS.fd /run/${dirName}/nix-ovmf/
+          ln -s --force ${cfg.qemuOvmfPackage.fd}/FV/OVMF_CODE.fd /run/${dirName}/nix-ovmf/
+          ln -s --force ${cfg.qemuOvmfPackage.fd}/FV/OVMF_VARS.fd /run/${dirName}/nix-ovmf/
         ''}
       '';
 
