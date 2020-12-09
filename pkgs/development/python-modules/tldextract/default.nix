@@ -1,4 +1,4 @@
-{ lib, fetchPypi, buildPythonPackage, setuptools_scm
+{ lib, fetchPypi, buildPythonPackage, setuptools_scm, filelock
 , requests, requests-file, idna, pytest
 , responses
 }:
@@ -12,7 +12,7 @@ buildPythonPackage rec {
     sha256 = "cfae9bc8bda37c3e8c7c8639711ad20e95dc85b207a256b60b0b23d7ff5540ea";
   };
 
-  propagatedBuildInputs = [ requests requests-file idna ];
+  propagatedBuildInputs = [ requests requests-file idna filelock ];
   checkInputs = [ pytest responses ];
   nativeBuildInputs = [ setuptools_scm ];
 
