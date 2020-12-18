@@ -6531,6 +6531,10 @@ in
 
   phodav = callPackage ../tools/networking/phodav { };
 
+  phoc = callPackage ../applications/misc/phoc { };
+
+  phosh = callPackage ../applications/window-managers/phosh { };
+
   pim6sd = callPackage ../servers/pim6sd { };
 
   pinentry = libsForQt5.callPackage ../tools/security/pinentry {
@@ -7437,6 +7441,8 @@ in
   squashfs-tools-ng = callPackage ../tools/filesystems/squashfs-tools-ng { };
 
   squashfuse = callPackage ../tools/filesystems/squashfuse { };
+
+  squeekboard = callPackage ../applications/misc/squeekboard { };
 
   srcml = callPackage ../applications/version-management/srcml { };
 
@@ -11482,6 +11488,8 @@ in
   };
 
   fedpkg = pythonPackages.callPackage ../development/tools/fedpkg { };
+
+  feedbackd = callPackage ../applications/misc/feedbackd { };
 
   flex_2_5_35 = callPackage ../development/tools/parsing/flex/2.5.35.nix { };
   flex = callPackage ../development/tools/parsing/flex { };
