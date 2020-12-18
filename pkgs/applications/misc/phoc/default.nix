@@ -14,18 +14,19 @@
 , libdrm
 , libxkbcommon
 , wlroots
+, python3
 }:
 
 stdenv.mkDerivation rec {
   pname = "phoc";
-  version = "0.1.8";
+  version = "0.5.1";
 
   src = fetchFromGitLab {
     domain = "source.puri.sm";
     owner = "Librem5";
     repo = pname;
     rev = "v${version}";
-    sha256 = "135bpfxgpizfvhdgyl1n3b1b2gpddb8i7s2lmzfijiaa3gz8bdnq";
+    sha256 = "0g2l3g4680f9jqlsaksmknhxa9wx8dby94qsd93maf0ik9hj7a88";
   };
 
   nativeBuildInputs = [
@@ -33,6 +34,7 @@ stdenv.mkDerivation rec {
     ninja
     pkg-config
     wrapGAppsHook
+    python3
   ];
 
   buildInputs = [
@@ -49,6 +51,10 @@ stdenv.mkDerivation rec {
   ];
 
   mesonFlags = ["-Dembed-wlroots=disabled"];
+
+  prePatch = ''
+    patchShebangs build-aux/post_install.py
+  '';
 
   postInstall = ''
     ${glib.dev}/bin/glib-compile-schemas $out/share/glib-2.0/schemas

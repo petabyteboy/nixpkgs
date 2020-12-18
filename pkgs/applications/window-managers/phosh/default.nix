@@ -26,6 +26,8 @@
 , git
 , writeText
 , makeDesktopItem
+, systemd
+, libxkbcommon
 }:
 
 let
@@ -39,14 +41,14 @@ let
 
 in stdenv.mkDerivation rec {
   pname = "phosh";
-  version = "0.3.0";
+  version = "0.7.1";
 
   src = fetchFromGitLab {
     domain = "source.puri.sm";
     owner = "Librem5";
     repo = pname;
     rev = "v${version}";
-    sha256 = "07fw1310y5r3kgcry6ac1j2p4v2lkjy3pwxw2hkaqf67whnsh95i";
+    sha256 = "0miv8si59ddc6f99a2vn6a8wlj04w2ana4kf1zand6m5vgcxavm6";
   };
 
   patches = [
@@ -80,6 +82,8 @@ in stdenv.mkDerivation rec {
     upower
     wayland
     feedbackd
+    systemd
+    libxkbcommon
   ];
 
   checkInputs = [
