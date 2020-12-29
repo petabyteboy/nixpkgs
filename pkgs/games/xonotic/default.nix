@@ -139,6 +139,7 @@ in rec {
         hydraPlatforms = [];
       };
     };
+    preferLocalBuild = true;
   } (''
     mkdir -p $out/bin
   '' + lib.optionalString withDedicated ''
