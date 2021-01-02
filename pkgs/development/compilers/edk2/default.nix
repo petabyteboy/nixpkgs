@@ -46,6 +46,13 @@ edk2 = buildStdenv.mkDerivation {
     sha256 = "1fvlz1z075jr6smq9qa0asy6fxga1gljcfd0764ypzy1mw963c9s";
   };
 
+  patchses = [
+    (fetchpatch {
+      url = "https://github.com/tianocore/edk2/pull/1170/commits/f1d990533693a520e9f4ea3bfccecd29908608e3.patch";
+      sha256 = "1p68j8lzl3zmycbx9sxd5h5n1ncs5mr6bapq8s469k6y19banmn5";
+    })
+  ];
+
   buildInputs = [ libuuid pythonEnv ];
 
   makeFlags = [ "-C BaseTools" ]
