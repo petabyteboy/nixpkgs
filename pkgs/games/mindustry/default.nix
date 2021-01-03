@@ -5,8 +5,12 @@
 , gradleGen
 , jdk
 , perl
-, jre
 , alsaLib
+, zip
+
+# arc-natives
+, callPackage
+, glew
 
 # Make the build version easily overridable.
 # Server and client build versions must match, and an empty build version means
@@ -61,17 +65,12 @@ let
   gradle_6 = (gradleGen.override (old: { java = jdk; })).gradle_6_7;
 
   # fake build to pre-download deps into fixed-output derivation
-  deps = stdenv.mkDerivation {
-    pname = "${pname}-deps";
-    inherit version src postPatch;
-    nativeBuildInputs = [ gradle_6 perl ];
-    # Here we build both the server and the client so we only have to specify
-    # one hash for 'deps'. Deps can be garbage collected after the build,
-    # so this is not really an issue.
+  mkDeps = args: stdenv.mkDerivation (args // {
+    pname = "${args.pname}-deps";
+    nativeBuildInputs = [ gradle_6 perl ] ++ (args.nativeBuildInputs or []);
     buildPhase = ''
       ${preBuild}
-      gradle --no-daemon desktop:dist -Pbuildversion=${buildVersion}
-      gradle --no-daemon server:dist -Pbuildversion=${buildVersion}
+      ${stdenv.lib.concatMapStringsSep "\n" (v: "gradle --no-daemon ${v} -Pbuildversion=${buildVersion}") args.gradleTasks}
     '';
     # perl code mavenizes pathes (com.squareup.okio/okio/1.13.0/a9283170b7305c8d92d25aff02a6ab7e45d06cbe/okio-1.13.0.jar -> com/squareup/okio/okio/1.13.0/okio-1.13.0.jar)
     installPhase = ''
@@ -81,29 +80,51 @@ let
     '';
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
+  });
+
+  deps = mkDeps {
+    # Here we build both the server and the client so we only have to specify
+    # one hash for 'deps'. Deps can be garbage collected after the build,
+    # so this is not really an issue.
+    gradleTasks = [
+      "desktop:dist"
+      "server:dist"
+    ];
     outputHash = "0vzck6hsrvs438s3ikk66qmpak88bmqcb8inqbbjwy7x87d2qsvj";
+    inherit version src postPatch pname;
+  };
+
+  arc-natives = callPackage ./arc.nix {
+    inherit gradle_6 mkDeps glew version;
   };
 
   # Separate commands for building and installing the server and the client
   buildClient = ''
     gradle --offline --no-daemon desktop:dist -Pbuildversion=${buildVersion}
   '';
+
   buildServer = ''
     gradle --offline --no-daemon server:dist -Pbuildversion=${buildVersion}
   '';
+
   installClient = ''
-    install -Dm644 desktop/build/libs/Mindustry.jar $out/share/mindustry.jar
     mkdir -p $out/bin
-    makeWrapper ${jre}/bin/java $out/bin/mindustry \
+    makeWrapper ${jdk}/bin/java $out/bin/mindustry \
       ${stdenv.lib.optionalString stdenv.isLinux "--prefix LD_LIBRARY_PATH : ${alsaLib}/lib"} \
       --add-flags "-jar $out/share/mindustry.jar"
+    install -Dm644 desktop/build/libs/Mindustry.jar $out/share/mindustry.jar
     install -Dm644 core/assets/icons/icon_64.png $out/share/icons/hicolor/64x64/apps/mindustry.png
     install -Dm644 ${desktopItem}/share/applications/Mindustry.desktop $out/share/applications/Mindustry.desktop
+  '' + stdenv.lib.optionalString stdenv.isLinux ''
+    pushd ${arc-natives}
+    zip $out/share/mindustry.jar libsdl-arc64.so
+    popd
   '';
+
   installServer = ''
     install -Dm644 server/build/libs/server-release.jar $out/share/mindustry-server.jar
     mkdir -p $out/bin
-    makeWrapper ${jre}/bin/java $out/bin/mindustry-server \
+    makeWrapper ${jdk}/bin/java $out/bin/mindustry-server \
       --add-flags "-jar $out/share/mindustry-server.jar"
   '';
 
@@ -113,7 +134,7 @@ assert stdenv.lib.assertMsg (enableClient || enableServer)
 stdenv.mkDerivation rec {
   inherit pname version src postPatch;
 
-  nativeBuildInputs = [ gradle_6 makeWrapper ];
+  nativeBuildInputs = [ gradle_6 makeWrapper ] ++ stdenv.lib.optional stdenv.isLinux zip;
 
   buildPhase = with stdenv.lib; ''
     ${preBuild}
