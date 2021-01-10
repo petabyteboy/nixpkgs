@@ -90,7 +90,7 @@ let
       "desktop:dist"
       "server:dist"
     ];
-    outputHash = "0vzck6hsrvs438s3ikk66qmpak88bmqcb8inqbbjwy7x87d2qsvj";
+    outputHash = "0000000000000000000000000000000000000000000000000000";
     inherit version src postPatch pname;
   };
 
