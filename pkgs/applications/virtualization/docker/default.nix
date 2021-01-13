@@ -79,8 +79,6 @@ rec {
 
       extraPath = optionals (stdenv.isLinux) (makeBinPath [ iproute iptables e2fsprogs xz xfsprogs procps util-linux git ]);
 
-      dontStrip = true;
-
       buildPhase = ''
         export GOCACHE="$TMPDIR/go-cache"
         # build engine
