@@ -173,6 +173,7 @@ stdenv.mkDerivation rec {
     gradle --offline --no-daemon jnigenBuild -Pbuildversion=${buildVersion}
     gradle --offline --no-daemon sdlnatives -Pdynamic -Pbuildversion=${buildVersion}
     patchelf ../Arc/backends/backend-sdl/libs/linux64/libsdl-arc*.so \
+      --set-rpath ${lib.makeLibraryPath [ glew.out SDL2 ]} \
       --add-needed ${glew.out}/lib/libGLEW.so \
       --add-needed ${SDL2}/lib/libSDL2.so
     gradle --offline --no-daemon desktop:dist -Pbuildversion=${buildVersion}
