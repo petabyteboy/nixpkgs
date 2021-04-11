@@ -92,7 +92,7 @@ stdenv.mkDerivation rec {
   buildInputs = [
     libelf setupHook pcre
     bash gnum4 # install glib-gettextize and m4 macros for other apps to use
-    gtk-doc
+    buildPackages.gtk-doc
   ] ++ optionals stdenv.isLinux [
     libselinux
     util-linuxMinimal # for libmount
