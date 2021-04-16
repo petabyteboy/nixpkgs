@@ -54,6 +54,7 @@ let
 
   patches = [
     ./0001-fix-include-path-for-SDL2-on-linux.patch
+    ./gradle-7.diff
   ];
 
   unpackPhase = ''
@@ -88,7 +89,7 @@ let
   '';
 
   # The default one still uses jdk8 (#89731)
-  gradle_6 = (gradleGen.override (old: { java = jdk; })).gradle_6_8;
+  gradle = (gradleGen.override (old: { java = jdk; })).gradle_7;
 
   # fake build to pre-download deps into fixed-output derivation
   deps = stdenv.mkDerivation {
@@ -96,7 +97,7 @@ let
     inherit version unpackPhase patches;
     postPatch = cleanupMindustrySrc;
 
-    nativeBuildInputs = [ gradle_6 perl ];
+    nativeBuildInputs = [ gradle perl ];
     # Here we download dependencies for both the server and the client so
     # we only have to specify one hash for 'deps'. Deps can be garbage
     # collected after the build, so this is not really an issue.
@@ -136,7 +137,7 @@ stdenv.mkDerivation rec {
   ];
   nativeBuildInputs = [
     pkg-config
-    gradle_6
+    gradle
     makeWrapper
     jdk
   ] ++ lib.optionals enableClient [
@@ -181,6 +182,7 @@ stdenv.mkDerivation rec {
   '' + ''
     runHook postInstall
   '';
+  passthru.deps = deps;
 
   meta = with lib; {
     homepage = "https://mindustrygame.github.io/";

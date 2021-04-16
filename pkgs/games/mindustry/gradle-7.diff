@@ -1,0 +1,13 @@
+diff --git a/build.gradle b/build.gradle
+index 0017d5872..fc6c8c7db 100644
+--- a/Mindustry/build.gradle
++++ b/Mindustry/build.gradle
+@@ -29,7 +29,7 @@ plugins{
+ }
+ 
+ allprojects{
+-    apply plugin: 'maven'
++    apply plugin: 'maven-publish'
+     
+     version = 'release'
+     group = 'com.github.Anuken'
