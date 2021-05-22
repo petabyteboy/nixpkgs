@@ -21471,6 +21471,8 @@ in
 
   ugtrain = callPackage ../tools/misc/ugtrain { };
 
+  unscd = callPackage ../os-specific/linux/unscd { };
+
   untie = callPackage ../os-specific/linux/untie { };
 
   upower = callPackage ../os-specific/linux/upower { };
