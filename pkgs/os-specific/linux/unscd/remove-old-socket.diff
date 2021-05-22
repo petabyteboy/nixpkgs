@@ -1,0 +1,28 @@
+diff --git a/nscd.c b/nscd.c
+index c4e4ecb..80e5a4e 100644
+--- a/nscd.c
++++ b/nscd.c
+@@ -2100,7 +2100,6 @@ static void main_loop(void)
+ #define NSCD_PIDFILE    "/var/run/nscd/nscd.pid"
+ #define NSCD_DIR        "/var/run/nscd"
+ #define NSCD_SOCKET     "/var/run/nscd/socket"
+-#define NSCD_SOCKET_OLD "/var/run/.nscd_socket"
+ 
+ static smallint wrote_pidfile;
+ 
+@@ -2108,7 +2107,6 @@ static void cleanup_on_signal(int sig)
+ {
+ 	if (wrote_pidfile)
+ 		unlink(NSCD_PIDFILE);
+-	unlink(NSCD_SOCKET_OLD);
+ 	unlink(NSCD_SOCKET);
+ 	exit(0);
+ }
+@@ -2609,7 +2607,6 @@ int main(int argc, char **argv)
+ 		chmod(NSCD_DIR, 0755);
+ 	}
+ 	pfd[0].fd = open_socket(NSCD_SOCKET);
+-	pfd[1].fd = open_socket(NSCD_SOCKET_OLD);
+ 	pfd[0].events = POLLIN;
+ 	pfd[1].events = POLLIN;
+ 
