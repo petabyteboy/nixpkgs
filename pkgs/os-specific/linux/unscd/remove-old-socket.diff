@@ -1,0 +1,133 @@
+diff --git a/nscd.c b/nscd.c
+index a71e474..6b7d807 100755
+--- a/nscd.c
++++ b/nscd.c
+@@ -154,6 +154,10 @@ vda.linux@googlemail.com
+ 
+ #define DEBUG_BUILD 1
+ 
++#define NSCD_NUM_SOCKS   1
++static const char *const nscd_socks[] = {
++	"/var/run/nscd/socket",
++};
+ 
+ /*
+ ** Generic helpers
+@@ -1811,7 +1815,7 @@ static void handle_worker_response(int i)
+ 			 * wake them (and us) up and set refcount = no_of_clients */
+ 			unsigned j;
+ 
+-			for (j = 2; j < num_clients; j++) {
++			for (j = NSCD_NUM_SOCKS; j < num_clients; j++) {
+ 				if (cinfo[j].cache_pp == cache_pp) {
+ 					/* This client uses the same cache entry */
+ 					ref++;
+@@ -1851,7 +1855,7 @@ static void main_loop(void)
+ 		int r;
+ 
+ 		r = SMALL_POLL_TIMEOUT_MS;
+-		if (num_clients <= 2 && !cached_cnt)
++		if (num_clients <= NSCD_NUM_SOCKS && !cached_cnt)
+ 			r = -1; /* infinite */
+ 		else if (num_clients < max_reqnum)
+ 			r = aging_interval_ms;
+@@ -1894,7 +1898,7 @@ static void main_loop(void)
+ 		if (r == 0)
+ 			goto skip_fd_checks;
+ 
+-		for (i = 0; i < 2; i++) {
++		for (i = 0; i < NSCD_NUM_SOCKS; i++) {
+ 			int cfd;
+ 			if (!pfd[i].revents)
+ 				continue;
+@@ -1921,8 +1925,9 @@ static void main_loop(void)
+ 			num_clients++;
+ 			if (num_clients >= max_reqnum) {
+ 				/* stop accepting new connects for now */
+-				pfd[0].events = pfd[0].revents = 0;
+-				pfd[1].events = pfd[1].revents = 0;
++				for (i = 0; i < NSCD_NUM_SOCKS; i++) {
++					pfd[i].events = pfd[i].revents = 0;
++				}
+ 			}
+ 		}
+ 		for (; i < num_clients; i++) {
+@@ -2041,7 +2046,7 @@ static void main_loop(void)
+ 					goto write_out;
+ 				}
+ 			}
+-		} /* for each client[2..num_clients-1] */
++		} /* for each client[NSCD_NUM_SOCKS..num_clients-1] */
+ 
+  skip_fd_checks:
+ 		/* Age cache */
+@@ -2051,7 +2056,7 @@ static void main_loop(void)
+ 		}
+ 
+ 		/* Close timed out client connections */
+-		for (i = 2; i < num_clients; i++) {
++		for (i = NSCD_NUM_SOCKS; i < num_clients; i++) {
+ 			if (pfd[i].fd != 0 /* not closed yet? */
+ 			 && cinfo[i].client_fd == 0 /* do we still wait for client, not worker? */
+ 			 && (g_now_ms - cinfo[i].started_ms) > CLIENT_TIMEOUT_MS
+@@ -2090,8 +2095,9 @@ static void main_loop(void)
+ 		min_closed = INT_MAX;
+ 		cnt_closed = 0;
+ 		/* start accepting new connects */
+-		pfd[0].events = POLLIN;
+-		pfd[1].events = POLLIN;
++		for (i = 0; i < NSCD_NUM_SOCKS; i++) {
++			pfd[i].events = POLLIN;
++		}
+ 	} /* while (1) */
+ }
+ 
+@@ -2102,8 +2108,6 @@ static void main_loop(void)
+ 
+ #define NSCD_PIDFILE    "/var/run/nscd/nscd.pid"
+ #define NSCD_DIR        "/var/run/nscd"
+-#define NSCD_SOCKET     "/var/run/nscd/socket"
+-#define NSCD_SOCKET_OLD "/var/run/.nscd_socket"
+ 
+ static smallint wrote_pidfile;
+ 
+@@ -2111,8 +2115,9 @@ static void cleanup_on_signal(int sig)
+ {
+ 	if (wrote_pidfile)
+ 		unlink(NSCD_PIDFILE);
+-	unlink(NSCD_SOCKET_OLD);
+-	unlink(NSCD_SOCKET);
++	for (int i = 0; i < NSCD_NUM_SOCKS; i++) {
++		unlink(nscd_socks[i]);
++	}
+ 	exit(0);
+ }
+ 
+@@ -2439,9 +2444,9 @@ static void special_op(const char *arg)
+ 		error_and_die("cannot create AF_UNIX socket");
+ 
+ 	addr.sun_family = AF_UNIX;
+-	strcpy(addr.sun_path, NSCD_SOCKET);
++	strcpy(addr.sun_path, nscd_socks[0]);
+ 	if (connect(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0)
+-		error_and_die("cannot connect to %s", NSCD_SOCKET);
++		error_and_die("cannot connect to %s", nscd_socks[0]);
+ 
+ 	if (!arg) { /* shutdown */
+ 		xfull_write(sock, &ureq, sizeof(ureq));
+@@ -2616,10 +2621,11 @@ int main(int argc, char **argv)
+ 		/* prevent bad mode of NSCD_DIR if umask is e.g. 077 */
+ 		chmod(NSCD_DIR, 0755);
+ 	}
+-	pfd[0].fd = open_socket(NSCD_SOCKET);
+-	pfd[1].fd = open_socket(NSCD_SOCKET_OLD);
+-	pfd[0].events = POLLIN;
+-	pfd[1].events = POLLIN;
++
++	for (int i = 0; i < NSCD_NUM_SOCKS; i++) {
++		pfd[i].fd = open_socket(nscd_socks[i]);
++		pfd[i].events = POLLIN;
++	}
+ 
+ 	if (debug & D_DAEMON) {
+ 		daemon(/*nochdir*/ 1, /*noclose*/ 0);
