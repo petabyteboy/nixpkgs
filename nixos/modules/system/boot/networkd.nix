@@ -514,6 +514,7 @@ let
       sectionRoutingPolicyRule = checkUnitConfig "RoutingPolicyRule" [
         (assertOnlyFields [
           "TypeOfService"
+          "Type"
           "From"
           "To"
           "FirewallMark"
@@ -531,6 +532,7 @@ let
         ])
         (assertInt "TypeOfService")
         (assertRange "TypeOfService" 0 255)
+        (assertValueOneOf "Type" ["local" "breadcast" "anycast" "multicast" "blackhole" "unreachable" "prohibit" "throw" "nat" "xresolve"])
         (assertInt "FirewallMark")
         (assertRange "FirewallMark" 1 4294967295)
         (assertInt "Priority")
