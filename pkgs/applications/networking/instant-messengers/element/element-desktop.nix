@@ -1,5 +1,5 @@
 { lib, fetchFromGitHub
-, makeWrapper, makeDesktopItem, mkYarnPackage
+, makeWrapper, makeDesktopItem, mkYarnPackage, callPackage
 , electron, element-web
 }:
 # Notes for maintainers:
@@ -15,6 +15,7 @@ let
     rev = "v${version}";
     sha256 = "sha256-nCtgVVOdjZ/OK8gMInBbNeuJadchDYUO2UQxEmcOm4s=";
   };
+  seshat-node = callPackage ./seshat-node {};
 in mkYarnPackage rec {
   name = "element-desktop-${version}";
   inherit version src;
@@ -32,6 +33,7 @@ in mkYarnPackage rec {
     cp -r './deps/element-desktop/res/img' "$out/share/element"
     rm "$out/share/element/electron/node_modules"
     cp -r './node_modules' "$out/share/element/electron"
+    cp -r '${seshat-node}' "$out/share/element/electron/node_modules/matrix-seshat"
 
     # icons
     for icon in $out/share/element/electron/build/icons/*.png; do
@@ -68,6 +70,10 @@ in mkYarnPackage rec {
       StartupWMClass=element
       MimeType=x-scheme-handler/element;
     '';
+  };
+
+  passthru = {
+    inherit seshat-node;
   };
 
   meta = with lib; {
