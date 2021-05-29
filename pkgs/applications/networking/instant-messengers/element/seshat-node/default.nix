@@ -1,4 +1,4 @@
-{ rustPlatform, fetchFromGitHub, nodejs-14_x, python3, callPackage, fixup_yarn_lock, yarn, sqlcipher }:
+{ rustPlatform, fetchFromGitHub, nodejs, python3, callPackage, fixup_yarn_lock, yarn, sqlcipher, electron }:
 
 rustPlatform.buildRustPackage rec {
   pname = "seshat-node";
@@ -13,16 +13,31 @@ rustPlatform.buildRustPackage rec {
 
   sourceRoot = "source/seshat-node/native";
 
-  nativeBuildInputs = [ nodejs-14_x python3 yarn ];
+  nativeBuildInputs = [ nodejs python3 yarn ];
   buildInputs = [ sqlcipher ];
 
-  npm_config_nodedir = nodejs-14_x;
 
   yarnOfflineCache = (callPackage ./seshat-yarndeps.nix {}).offline_cache;
 
   buildPhase = ''
     cd ..
     chmod u+w . ./yarn.lock
+
+    # Option 1
+    # tar -xf ${electron.headers}
+    # export npm_config_nodedir=$PWD/node_headers
+
+    # Option 2
+    mkdir -p .electron-gyp/${electron.version}
+    tar -x -C .electron-gyp/${electron.version} --strip-components=1 -f ${electron.headers}
+    echo 9 > .electron-gyp/${electron.version}/installVersion
+
+    export npm_config_target=${electron.version}
+    export npm_config_arch=x64
+    export npm_config_target_arch=x64
+    export npm_config_runtime=electron
+    export npm_config_build_from_source=true,
+    export npm_config_devdir=$PWD/.electron-gyp
 
     export HOME=/tmp
     yarn config --offline set yarn-offline-mirror ${yarnOfflineCache}
