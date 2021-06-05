@@ -773,6 +773,19 @@ let
         (assertValueOneOf "OnLink" boolValues)
       ];
 
+      sectionBridgeFDB = checkUnitConfig "BridgeFDB" [
+        (assertOnlyFields [
+          "MACAddress"
+          "Destination"
+          "VLANId"
+          "VNI"
+          "AssociatedWith"
+        ])
+        #(assertMacAddress "MACAddress")
+        # Destination
+        #(assert
+      ];
+
     };
   };
 
@@ -1090,6 +1103,19 @@ let
     };
   };
 
+  bridgeFdbOptions = {
+    options = {
+      ipv6PrefixConfig = mkOption {
+        default = {};
+        #example = { Prefix = "fd00::/64"; };
+        type = types.addCheck (types.attrsOf unitOption) check.network.sectionBridgeFDB;
+        description = ''
+          ...
+        '';
+      };
+    };
+  };
+
   networkOptions = commonNetworkOptions // {
 
     linkConfig = mkOption {
@@ -1210,6 +1236,15 @@ let
         A list of ipv6Prefix sections to be added to the unit.  See
         <citerefentry><refentrytitle>systemd.network</refentrytitle>
         <manvolnum>5</manvolnum></citerefentry> for details.
+      '';
+    };
+
+    bridgeFDBs = mkOption {
+      default = [];
+      #example = { AddressAutoconfiguration = true; OnLink = true; };
+      type = with types; listOf (submodule bridgeFdbOptions);
+      description = ''
+        ...
       '';
     };
 
