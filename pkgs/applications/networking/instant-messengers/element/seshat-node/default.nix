@@ -5,10 +5,10 @@ rustPlatform.buildRustPackage rec {
   version = "2.2.4";
 
   src = fetchFromGitHub {
-    owner = "matrix-org";
+    owner = "petabyteboy";
     repo = "seshat";
-    rev = version;
-    sha256 = "0kj73k15dyjz8c147jrhvc3x7w294ws2m8calaphc8q1d7iall8n";
+    rev = "a67737e7185376a85a39a225826651e6a8b82a7f";
+    sha256 = "0x8zdya1ga566j106gafs65q9a9xnhmycalcbkwksc3ssar3xw96";
   };
 
   sourceRoot = "source/seshat-node/native";
@@ -42,5 +42,5 @@ rustPlatform.buildRustPackage rec {
     cp -r . $out
   '';
 
-  cargoSha256 = "1ckyjvycqw35g6d7022pqbch5cg79drp6lwc0s5mw5787klckijm";
+  cargoSha256 = "09lr8gf9ig7fij9y2s9sj5xv5yk1v3fimy8169i656av7ppshq93";
 }

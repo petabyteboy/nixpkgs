@@ -9,7 +9,7 @@ if [ "$#" -ne 1 ] || [[ "$1" == -* ]]; then
   exit 1
 fi
 
-SRC="https://raw.githubusercontent.com/matrix-org/seshat/$1"
+SRC="https://raw.githubusercontent.com/petabyteboy/seshat/$1"
 
 wget "$SRC/seshat-node/package.json" -O seshat-package.json
 wget "$SRC/seshat-node/yarn.lock" -O seshat-yarndeps.lock
