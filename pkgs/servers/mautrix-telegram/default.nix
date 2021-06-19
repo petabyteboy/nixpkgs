@@ -30,12 +30,14 @@ in buildPythonPackage rec {
     Mako
     aiohttp
     mautrix
-    sqlalchemy
+    sqlalchemy_1_3
     CommonMark
     ruamel_yaml
     python_magic
     telethon
-    telethon-session-sqlalchemy
+    (telethon-session-sqlalchemy.override {
+      sqlalchemy = sqlalchemy_1_3;
+    })
     pillow
     lxml
     setuptools
