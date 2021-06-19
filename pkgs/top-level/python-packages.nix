@@ -8111,7 +8111,7 @@ in {
 
   sqlalchemy_1_3 = callPackage ../development/python-modules/sqlalchemy/1.3.nix { };
   sqlalchemy_1_4 = callPackage ../development/python-modules/sqlalchemy/1.4.nix { };
-  sqlalchemy = self.sqlalchemy_1_4;
+  sqlalchemy = self.sqlalchemy_1_3;
 
   sqlalchemy-citext = callPackage ../development/python-modules/sqlalchemy-citext { };
 
