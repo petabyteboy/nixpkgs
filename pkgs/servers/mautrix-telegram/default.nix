@@ -29,7 +29,9 @@ in buildPythonPackage rec {
   propagatedBuildInputs = [
     Mako
     aiohttp
-    mautrix
+    (mautrix.override {
+      sqlalchemy = sqlalchemy_1_3;
+    })
     sqlalchemy_1_3
     CommonMark
     ruamel_yaml
